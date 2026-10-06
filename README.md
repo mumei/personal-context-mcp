@@ -28,7 +28,58 @@ npm run build
 
 サーバーとVueのWeb UIが `dist/` に生成されます。ソースを更新した場合も同じビルドを実行し、接続中のMCPを再起動してください。
 
+### 最新ソースへ更新する
+
+クローンしたリポジトリのルートで、作業中の変更と現在のブランチを確認します。
+
+```bash
+git status --short
+git branch --show-current
+```
+
+変更がなく、ブランチが`main`である場合だけ、次へ進んでください。変更がある場合や別のブランチにいる場合は、先に内容を確認し、上書きや破棄をしないでください。
+
+```bash
+git pull --ff-only origin main
+```
+
+履歴が分岐していると、このコマンドは停止します。強制更新せず、分岐の理由を確認してください。取得後は、接続中のMCPをクライアント側で停止してから再ビルドします。
+
+```bash
+npm ci
+npm run build
+```
+
+ビルド後にクライアント側でMCPを再起動し、利用ガイド取得やWeb表示を確認してください。ビルドは`dist`を作り直すため、起動したまま実行しないでください。
+
 ## MCPクライアントに登録する
+
+### Codexにはコマンドで登録する
+
+ビルド済みリポジトリのルートで、同名の登録がないか確認します。
+
+```bash
+codex mcp get personal-context-mcp
+```
+
+登録済みなら起動コマンドと保存先を確認し、追加や削除はしないでください。未登録の場合だけ、ビルド済みサーバーを登録します。
+
+```bash
+codex mcp add personal-context-mcp \
+  --env TASK_MCP_DATA_ROOT="$HOME/.tasks" \
+  -- node "$(pwd)/dist/server.js"
+```
+
+`$(pwd)`はリポジトリの絶対パスに展開されます。別の場所から実行する場合は、ビルド済みサーバーの絶対パスへ置き換えてください。保存先は`TASK_MCP_DATA_ROOT`で変更できます。通常の保存先は`~/.tasks`です。
+
+登録を確認します。
+
+```bash
+codex mcp get personal-context-mcp
+codex mcp list
+```
+
+これらは登録内容の確認で、接続成功を保証するものではありません。Codexを再起動したあと、AIに`system_get_usage_guide`を呼ばせて接続を確認してください。Codex CLIの会話画面では`/mcp`も使えます。通常の設定ファイルは`~/.codex/config.toml`です。詳しくは[OpenAI公式MCPガイド](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)を参照してください。MCPはCodex側が起動するため、別途サーバーを手動起動する必要はありません。
 
 ### Claude Codeにはコマンドで登録する
 
