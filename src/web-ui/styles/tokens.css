@@ -1,0 +1,118 @@
+/* Hallmark · genre: modern-minimal · macrostructure: Workbench · theme: Personal Context MCP Teal Instrument
+ * designed-as-app · nav: persistent index rail · enrichment: none
+ * pre-emit critique: P5 H4 E5 S5 R5 V4 · contrast: pass · slop: pass
+ * honest: pass · chrome: pass · tokens: pass · responsive: pass · mobile: pass · icons: pass
+ */
+:root {
+  color: var(--color-ink);
+  background: var(--color-paper-2);
+  font-family: var(--font-body);
+  font-synthesis: none;
+
+  --color-paper: oklch(99% 0.004 205);
+  --color-paper-2: oklch(96.5% 0.008 205);
+  --color-paper-3: oklch(94% 0.011 205);
+  --color-ink: oklch(24% 0.025 210);
+  --color-ink-2: oklch(49% 0.025 210);
+  --color-rule: oklch(87% 0.014 205);
+  --color-rule-strong: oklch(72% 0.025 205);
+  --color-accent: oklch(48% 0.09 165);
+  --color-accent-hover: oklch(41% 0.085 165);
+  --color-accent-soft: oklch(94% 0.026 165);
+  --color-focus: oklch(65% 0.12 165);
+  --color-on-accent: oklch(99% 0 0);
+  --color-sidebar: oklch(22% 0.025 210);
+  --color-sidebar-raised: oklch(27% 0.03 210);
+  --color-sidebar-rule: oklch(36% 0.032 210);
+  --color-sidebar-text: oklch(95% 0.012 205);
+  --color-sidebar-muted: oklch(73% 0.025 205);
+  --color-sidebar-input: oklch(98% 0.006 205);
+  --color-sidebar-overlay: oklch(10% 0.015 210 / 48%);
+  --color-danger: oklch(48% 0.14 25);
+  --color-danger-soft: oklch(96% 0.025 25);
+  --color-danger-rule: oklch(76% 0.07 25);
+  --color-warning: oklch(50% 0.1 75);
+  --color-warning-soft: oklch(97% 0.025 85);
+  --color-warning-rule: oklch(78% 0.075 80);
+  --color-success: oklch(43% 0.085 160);
+  --color-success-soft: oklch(96% 0.025 160);
+  --color-success-rule: oklch(78% 0.055 160);
+  --color-status-todo: oklch(61% 0.02 210);
+  --color-status-progress: oklch(62% 0.11 165);
+  --color-status-waiting: oklch(67% 0.12 75);
+  --color-status-blocked: oklch(56% 0.16 25);
+  --color-status-done: oklch(56% 0.04 210);
+  --color-graph-concept: oklch(52% 0.09 165);
+  --color-graph-system: oklch(53% 0.1 245);
+  --color-graph-technology: oklch(51% 0.1 300);
+  --color-graph-organization: oklch(55% 0.1 35);
+  --color-graph-person: oklch(58% 0.1 75);
+  --color-graph-decision: oklch(51% 0.13 15);
+  --color-graph-document: oklch(52% 0.025 210);
+  --color-graph-edge: oklch(70% 0.025 210);
+  /* sRGB fallbacks for Cytoscape, whose canvas parser does not support OKLCH values. */
+  --color-cytoscape-ink: #102326;
+  --color-cytoscape-paper: #f9fdfd;
+  --color-cytoscape-focus: #32a67d;
+  --color-cytoscape-edge: #8da3a7;
+  --color-cytoscape-concept: #2b795c;
+  --color-cytoscape-system: #3371a2;
+  --color-cytoscape-technology: #6f5897;
+  --color-cytoscape-organization: #a35b48;
+  --color-cytoscape-person: #9d712d;
+  --color-cytoscape-decision: #a3414e;
+  --color-cytoscape-document: #596d71;
+  --color-project-1: oklch(48% 0.09 165);
+  --color-project-2: oklch(51% 0.1 245);
+  --color-project-3: oklch(53% 0.1 300);
+  --color-project-4: oklch(55% 0.1 35);
+  --color-project-5: oklch(57% 0.11 75);
+  --color-project-6: oklch(48% 0.08 205);
+  --color-project-soft-1: oklch(94% 0.026 165);
+  --color-project-soft-2: oklch(94% 0.025 245);
+  --color-project-soft-3: oklch(95% 0.025 300);
+  --color-project-soft-4: oklch(95% 0.03 35);
+  --color-project-soft-5: oklch(96% 0.035 75);
+  --color-project-soft-6: oklch(94% 0.018 205);
+
+  --font-display: Inter, "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --font-body: Inter, "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+
+  --radius-control: 4px;
+  --radius-surface: 6px;
+  --control-height: 40px;
+  --header-height: 72px;
+  --sidebar-width: 288px;
+  --content-max: 1440px;
+  --duration-control: 140ms;
+  --ease-control: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Compatibility aliases retained for existing component contracts. */
+  --sidebar: var(--color-sidebar);
+  --sidebar-line: var(--color-sidebar-rule);
+  --surface: var(--color-paper);
+  --surface-soft: var(--color-paper-2);
+  --line: var(--color-rule);
+  --text: var(--color-ink);
+  --muted: var(--color-ink-2);
+  --accent: var(--color-accent);
+  --accent-soft: var(--color-accent-soft);
+  --danger: var(--color-danger);
+  --warning: var(--color-warning);
+  --radius: var(--radius-surface);
+}

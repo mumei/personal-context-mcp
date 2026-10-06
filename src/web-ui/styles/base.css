@@ -1,0 +1,142 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+html,
+body {
+  overflow-x: clip;
+}
+body {
+  min-width: 0;
+  color: var(--color-ink);
+  background: var(--color-paper-2);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: 0;
+}
+button {
+  cursor: pointer;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid color-mix(in oklch, var(--color-focus) 55%, transparent);
+  outline-offset: 2px;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+h1,
+h2,
+h3,
+h4 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-style: normal;
+  letter-spacing: 0;
+}
+.stack {
+  display: grid;
+  gap: var(--space-sm);
+}
+.grid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.muted {
+  color: var(--muted);
+}
+.surface {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+.page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--color-rule-strong);
+  padding-block-end: var(--space-xs);
+}
+.page-heading h2 {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+.page-heading p {
+  margin: var(--space-3xs) 0 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.value-list {
+  margin: 0;
+  padding-left: 20px;
+}
+.value-list li + li {
+  margin-top: 6px;
+}
+.markdown-body {
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.markdown-body img {
+  max-width: 100%;
+}
+.markdown-body pre {
+  overflow: auto;
+  padding: var(--space-xs);
+  background: var(--color-paper-3);
+  font-family: var(--font-mono);
+}
+::selection {
+  color: var(--color-ink);
+  background: var(--color-accent-soft);
+}
+* {
+  scrollbar-color: var(--color-rule-strong) transparent;
+  scrollbar-width: thin;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width: 720px) {
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

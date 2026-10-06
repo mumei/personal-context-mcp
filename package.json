@@ -1,0 +1,129 @@
+{
+  "name": "personal-context-mcp",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mumei/personal-context-mcp.git"
+  },
+  "homepage": "https://github.com/mumei/personal-context-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/mumei/personal-context-mcp/issues"
+  },
+  "files": [
+    "dist/",
+    "docs/usage.md",
+    "docs/configuration.md",
+    "docs/tickets.md",
+    "docs/context-isolation.md",
+    "docs/publishing.md",
+    "src/README.md"
+  ],
+  "description": "Local personal context infrastructure for tasks, activities, memory, knowledge, people, and reports.",
+  "type": "module",
+  "imports": {
+    "#app/*": {
+      "types": "./src/application/*.ts",
+      "default": "./dist/application/*.js"
+    },
+    "#domain/*": {
+      "types": "./src/domains/*.ts",
+      "default": "./dist/domains/*.js"
+    },
+    "#infra/*": {
+      "types": "./src/infrastructure/*.ts",
+      "default": "./dist/infrastructure/*.js"
+    },
+    "#llm/*": {
+      "types": "./src/llm/*.ts",
+      "default": "./dist/llm/*.js"
+    },
+    "#mcp/*": {
+      "types": "./src/mcp/*.ts",
+      "default": "./dist/mcp/*.js"
+    },
+    "#server": {
+      "types": "./src/server.ts",
+      "default": "./dist/server.js"
+    },
+    "#shared/*": {
+      "types": "./src/shared/*.ts",
+      "default": "./dist/shared/*.js"
+    },
+    "#web/*": {
+      "types": "./src/web/*.ts",
+      "default": "./dist/web/*.js"
+    },
+    "#webServer": {
+      "types": "./src/webServer.ts",
+      "default": "./dist/webServer.js"
+    },
+    "#webUi/*.vue": {
+      "types": "./src/web-ui/*.vue",
+      "default": "./dist/web-ui/*.js"
+    },
+    "#webUi/*.yaml": {
+      "types": "./src/web-ui/*.yaml",
+      "default": "./dist/web-ui/*.js"
+    },
+    "#webUi/*": {
+      "types": "./src/web-ui/*.ts",
+      "default": "./dist/web-ui/*.js"
+    }
+  },
+  "bin": {
+    "personal-context-mcp": "dist/server.js",
+    "personal-context-mcp-web": "dist/webServer.js",
+    "task-mcp": "dist/server.js",
+    "task-mcp-web": "dist/webServer.js"
+  },
+  "scripts": {
+    "prepack": "npm run build",
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.json && vite build && node scripts/third-party-notices.mjs",
+    "build:web": "vite build",
+    "dev": "tsx src/entrypoints/mcp.ts",
+    "web": "tsx src/entrypoints/web.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:web": "eslint \"src/web-ui/**/*.{ts,vue}\"",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit && vue-tsc -p tsconfig.web.json --noEmit"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.24.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cytoscape": "^3.34.0",
+    "marked": "^18.0.6",
+    "sanitize-html": "^2.17.6",
+    "vue": "^3.5.39",
+    "vue-i18n": "^11.4.6",
+    "vue-router": "^4.6.4",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/cytoscape": "^3.21.9",
+    "@types/node": "^24.10.1",
+    "@types/sanitize-html": "^2.16.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.9.2",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.9.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.3.6",
+    "vitest": "^4.0.14",
+    "vue-eslint-parser": "^10.4.1",
+    "vue-tsc": "^3.3.7"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

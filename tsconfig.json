@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "#app/*": ["src/application/*"],
+      "#domain/*": ["src/domains/*"],
+      "#infra/*": ["src/infrastructure/*"],
+      "#llm/*": ["src/llm/*"],
+      "#mcp/*": ["src/mcp/*"],
+      "#server": ["src/server.ts"],
+      "#shared/*": ["src/shared/*"],
+      "#web/*": ["src/web/*"],
+      "#webServer": ["src/webServer.ts"],
+      "#webUi/*.vue": ["src/web-ui/*.vue"],
+      "#webUi/*.yaml": ["src/web-ui/*.yaml"],
+      "#webUi/*": ["src/web-ui/*"]
+    },
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "src/web-ui"]
+}

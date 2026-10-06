@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.npm-cache/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.idea/
+.hallmark/
+AGENTS.md
