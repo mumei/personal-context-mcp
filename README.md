@@ -30,6 +30,40 @@ npm run build
 
 ## MCPクライアントに登録する
 
+### Claude Codeにはコマンドで登録する
+
+先にソースからビルドし、クローンした`personal-context-mcp`のルートディレクトリで実行してください。npmパッケージは未公開のため、`npx personal-context-mcp`ではなく、ビルド済みの`dist/server.js`を登録します。
+
+同名の登録がないか、まず確認します。
+
+```bash
+claude mcp get personal-context-mcp
+```
+
+登録済みなら表示されたコマンド・保存先・scopeを確認し、次の追加コマンドは実行しないでください。同名設定を勝手に上書き・削除する手順ではありません。未登録の場合だけ追加します。
+
+```bash
+claude mcp add --scope user \
+  --env TASK_MCP_DATA_ROOT="$HOME/.tasks" \
+  --transport stdio personal-context-mcp \
+  -- node "$(pwd)/dist/server.js"
+```
+
+`$(pwd)`は現在のディレクトリの絶対パスに展開されます。別の場所から登録する場合は、自分の環境の`/absolute/path/personal-context-mcp/dist/server.js`へ置き換えてください。保存先は`TASK_MCP_DATA_ROOT`で指定します。既存の保存先を使う場合はその絶対パスへ変更してください。
+
+`--scope user`は自分の全プロジェクトで使う設定です。`--transport stdio`はClaude Codeがローカルプロセスを起動して接続する方式で、`--`以降がサーバーの起動コマンドです。通常はClaude CodeがMCPを起動するため、別途`npm start`などでサーバーを起動する必要はありません。
+
+登録内容と接続を確認します。
+
+```bash
+claude mcp get personal-context-mcp
+claude mcp list
+```
+
+Claude Codeの会話画面でも`/mcp`で状態を確認できます。接続後はAIに`system_get_usage_guide`を呼ばせてください。stdioとscopeの仕様は[Claude Code公式ガイド](https://code.claude.com/docs/en/mcp)を参照してください。このコマンドはClaude Code向けで、Claude Desktopの設定とは別です。
+
+### 設定ファイルで登録する
+
 クライアントのMCP設定に、Node.jsとビルド済みのサーバーを登録します。次のパスは、自分の環境の絶対パスへ置き換えてください。JSON中の `~` はクライアントが展開しない場合があります。
 
 ```json
