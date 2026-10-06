@@ -1,19 +1,19 @@
 # 公開前チェック
 
-確認日: 2026-10-06。公開候補のソースとnpm配布物を分けて検証しました。GitHubへの初回公開はユーザー承認済みです。既存Git履歴の変更、実データ削除、npmレジストリへのpublishは行っていません。
+確認日: 2026-10-06。許可したソースだけを[GitHub](https://github.com/mumei/personal-context-mcp)へ初回公開し、新規cloneから導入を検証しました。既存Git履歴の変更、実データ削除、npmレジストリへのpublishは行っていません。
 
 ## 先に決めること
 
-| 項目       | 現状                                                                     | 公開前に必要な対応                              |
-| ---------- | ------------------------------------------------------------------------ | ----------------------------------------------- |
-| ライセンス | MIT。LICENSE・package・lockfileに反映済み                                | 配布物にLICENSEを同梱し、第三者ライセンスを保持 |
-| 配布先     | mumei/personal-context-mcpを承認済み。repository・homepage・bugs設定済み | 公開操作の指示後にリポジトリとIssue窓口を開設   |
-| npm公開物  | filesで許可したdist・ガイドだけを同梱。prepackで標準ビルド               | 公開直前に梱包結果を再確認                      |
-| 公開履歴   | 作業開始時はプロジェクト一式が未追跡                                     | 初回コミット前に対象ファイルを確認              |
+| 項目       | 現状                                                                           | 公開前に必要な対応                              |
+| ---------- | ------------------------------------------------------------------------------ | ----------------------------------------------- |
+| ライセンス | MIT。LICENSE・package・lockfileに反映済み                                      | 配布物にLICENSEを同梱し、第三者ライセンスを保持 |
+| 配布先     | mumei/personal-context-mcpをGitHub公開済み。repository・homepage・bugs設定済み | npm配布を行う場合は別途公開を判断               |
+| npm公開物  | filesで許可したdist・ガイドだけを同梱。prepackで標準ビルド                     | 公開直前に梱包結果を再確認                      |
+| 公開履歴   | 作業開始時はプロジェクト一式が未追跡                                           | 初回コミット前に対象ファイルを確認              |
 
 READMEの導入方法はソースからのビルドです。npm公開済みパッケージの存在を前提とした導入コマンドは記載していません。
 
-GitHub公開元はユーザー指定の`mumei`です。2026-10-05に`gh api user --jq .login`でも現在の認証アカウントが一致することを確認しました。著作権表記はユーザーが承認した`Copyright (c) 2026 mumei`で、[MIT LICENSE](../LICENSE)に記載しています。リポジトリの作成・push・公開は行っていません。
+GitHub公開元はユーザー指定の`mumei`です。`gh api user --jq .login`でも認証アカウントの一致を確認しました。著作権表記はユーザーが承認した`Copyright (c) 2026 mumei`で、[MIT LICENSE](../LICENSE)に記載しています。初回コミットには`mumei`とGitHubのnoreplyアドレスを使用しています。
 
 以前の梱包候補にはIDE設定や過去の作業文書が含まれていました。現在は`package.json.files`で実行用distと汎用ガイドだけを許可します。LICENSEとREADMEはnpmが同梱します。テスト・IDE設定・内部指示書・過去のHTMLレポートはnpm配布物に含めません。
 
@@ -77,7 +77,9 @@ npm pack
 - npmのCLIリンク経由で起動できない問題を修正し、梱包物の新規導入で60ツール、利用ガイド取得、Web画面とJSアセット、隔離保存先READMEを確認しました。
 - 稼働中MCPのdist・node_modules・データ保存先・認証設定は変更していません。
 
-公開予定先`mumei/personal-context-mcp`はユーザー承認済みです。repositoryは`git+https://github.com/mumei/personal-context-mcp.git`、homepageは同リポジトリのREADME、bugsは同リポジトリのIssue窓口を指定しました。これらは予定URLであり、公開済みの表記ではありません。リポジトリの作成・push・npm publishは、別の実行指示が必要です。
+公開先は`mumei/personal-context-mcp`です。repositoryは`git+https://github.com/mumei/personal-context-mcp.git`、homepageは同リポジトリのREADME、bugsは同リポジトリのIssue窓口を指定しています。
+
+GitHub初回公開では312ファイルをmainへpushし、PUBLIC状態を確認しました。公開後の新規cloneでREADME記載の`npm ci`と`npm run build`、349テストが成功しました。隔離保存先でMCPの60ツール・利用ガイド取得・同居WebとJSアセット・保存先README・単独Web起動も確認しています。検証プロセスは終了済みです。npm registryへの初回publishは未実施で、実行する場合は別の指示が必要です。
 
 ## 利用者へ伝えること
 
