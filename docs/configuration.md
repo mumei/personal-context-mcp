@@ -38,13 +38,28 @@ Webにはデータを更新するAPIがあります。既定のローカル待�
 | Provider           | 既定モデル           | モデルの上書き                    |
 | ------------------ | -------------------- | --------------------------------- |
 | `codex_app_server` | `gpt-6.1-sol`        | `TASK_MCP_CODEX_APP_SERVER_MODEL` |
-| `claude_cli`       | `claude-sonnet-4-6`  | `TASK_MCP_CLAUDE_MODEL`           |
+| `claude_cli`       | `claude-sonnet-5-5`  | `TASK_MCP_CLAUDE_MODEL`           |
 | `copilot_cli`      | `gpt-5.3-codex`      | `TASK_MCP_COPILOT_MODEL`          |
 | `cursor_cli`       | `gpt-5`              | `TASK_MCP_CURSOR_MODEL`           |
 | `gemini_cli`       | `gemini-2.5-pro`     | `TASK_MCP_GEMINI_MODEL`           |
 | `lm_studio`        | `openai/gpt-oss-20b` | `TASK_MCP_LM_STUDIO_MODEL`        |
 
 モデル名は実装の既定値です。利用できるモデルは各Providerの版・認証・契約によります。利用環境でモデルを確認し、必要なら上書きしてください。
+
+### モデル情報の確認記録（2026-10-07）
+
+固定モデルの既定値と、デイリータスク設定の選択肢は別です。新しい選択肢を追加しても、保存済みのモデルや環境変数による上書きは変更しません。高額なモデルや自動選択への一律移行も行いません。
+
+| Provider         | 確認結果と対応                                                                                                                                                                                                                                                                                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codex App Server | [Codex公式モデル案内](https://learn.chatgpt.com/docs/models)で`gpt-6.1-sol`のCLI対応を確認し、既定値を維持。[APIモデル一覧](https://developers.openai.com/api/docs/models)への掲載だけではCodexで利用可能とは判断しない。                                                                                                                            |
+| Claude Code      | [モデル設定](https://code.claude.com/docs/en/model-config)と[モデル一覧](https://platform.claude.com/docs/en/models/overview)でSonnet 5.5を確認。既定値は`claude-sonnet-5-5`へ更新し、Opus 5.5も選択肢に追加。Sonnet 5.5にはClaude Code **2.1.284以降**、Opus 5.5には**2.1.280以降**が必要。既存の4.6指定は維持できる。                              |
+| Copilot CLI      | [公式CLI対応モデル](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#supported-models)にあるGPT-6 Sol/Luna/Astra、Opus 5.5、Haiku 4.5、Gemini 3.7 Flashを選択肢に追加。コード向けの`gpt-5.3-codex`は引き続き掲載されているため既定値を維持。Anthropic直接接続とはIDが異なり、Opusは`claude-opus-5.5`を使う。 |
+| Cursor CLI       | [公式CLIのモデル一覧機能](https://cursor.com/changelog/cli-jan-08-2026)で`agent models`を案内。確認環境の旧CLIでは一覧を取得できず、新モデルのCLI用IDを確認できないため既定値`gpt-5`を維持。Codex用IDを流用した候補は除き、`auto`と既定値のみ提示。保存済みの別モデルは画面に保持される。                                                            |
+| Gemini CLI       | [公式CLIモデル選択](https://geminicli.com/docs/cli/model/)に掲載された`gemini-3-pro-preview`を選択肢へ追加。既定値は`gemini-2.5-pro`を維持。[API側](https://ai.google.dev/gemini-api/docs/models)にはGemini 3.8 Flashがあるが、CLI利用可否を確認できないため追加しない。プレビューへの自動移行もしない。                                             |
+| LM Studio        | [ローカルAPIのモデル一覧](https://lmstudio.ai/docs/developer/openai-compat/models)で利用環境のモデルを確認する。読み込むモデルは端末とメモリ容量に依存するため、汎用的な「最新」へ置換せず既定値を維持。                                                                                                                                             |
+
+新しいモデルを選ぶ前に、対象CLIの版・契約・組織の許可を確認してください。この更新はCLI本体を自動更新せず、モデルの実リクエストや保存済み自動化の変更も行いません。
 
 Codex App Serverの実行ファイルは `TASK_MCP_CODEX_APP_SERVER_COMMAND`、`CODEX_CLI_PATH`、ChatGPT App同梱CLI、PATHの `codex` の順に選びます。各CLIのコマンドは `TASK_MCP_CLAUDE_COMMAND`、`TASK_MCP_COPILOT_COMMAND`、`TASK_MCP_CURSOR_COMMAND`、`TASK_MCP_GEMINI_COMMAND` で変更できます。
 

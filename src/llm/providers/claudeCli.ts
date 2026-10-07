@@ -12,7 +12,7 @@
 
 import { spawn } from "node:child_process";
 
-export const CLAUDE_CLI_DEFAULT_MODEL = "claude-sonnet-4-6";
+export const CLAUDE_CLI_DEFAULT_MODEL = "claude-sonnet-5-5";
 
 /**
  * Defines the public `ClaudeCliRequest` data contract exposed by this module.

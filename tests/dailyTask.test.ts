@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   completeDailyTaskSettings,
+  dailyTaskModelOptions,
   dailyTaskSettingsPath,
   inspectDailyTaskClients,
   loadDailyTaskSettings,
@@ -43,6 +44,36 @@ function settings(overrides: Partial<DailyTaskSettings> = {}): DailyTaskSettings
 }
 
 describe("client-neutral daily task settings", () => {
+  it("keeps model identifiers scoped to their provider", () => {
+    const options = dailyTaskModelOptions();
+    expect(options.claude_code_loop).toContainEqual({ value: "claude-sonnet-5-5", recommended: true });
+    expect(options.claude_code_loop).toContainEqual({ value: "claude-sonnet-4-6", recommended: false });
+    expect(options.copilot_cli).toContainEqual({ value: "claude-opus-5.5", recommended: false });
+    expect(options.copilot_cli).toContainEqual({ value: "gpt-6-sol", recommended: false });
+    expect(options.copilot_cli.some(({ value }) => value === "claude-opus-5-5")).toBe(false);
+    expect(options.cursor).toEqual([
+      { value: "auto", recommended: true },
+      { value: "gpt-5", recommended: false },
+    ]);
+    expect(options.gemini_cli).toContainEqual({ value: "gemini-3-pro-preview", recommended: false });
+    for (const choices of Object.values(options)) {
+      expect(choices.filter(({ recommended }) => recommended)).toHaveLength(1);
+      expect(new Set(choices.map(({ value }) => value)).size).toBe(choices.length);
+    }
+  });
+
+  it("does not migrate an explicitly saved legacy Claude model", async () => {
+    const root = await mkdtemp(join(tmpdir(), "task-mcp-daily-task-"));
+    const codexPath = join(root, "automation.toml");
+    await completeDailyTaskSettings(
+      root,
+      settings({ runner: "claude_code_loop", model: "claude-sonnet-4-6" }),
+      undefined,
+      codexPath,
+    );
+    await expect(loadDailyTaskSettings(root, codexPath)).resolves.toMatchObject({ model: "claude-sonnet-4-6" });
+  });
+
   it("keeps the persisted model when a heartbeat automation has no model field", async () => {
     const root = await mkdtemp(join(tmpdir(), "task-mcp-daily-task-"));
     const codexPath = join(root, "automation.toml");
@@ -90,7 +121,7 @@ describe("client-neutral daily task settings", () => {
       integration: { mode: "managed", status: "synchronized" },
       model_options: {
         codex: expect.arrayContaining([{ value: "gpt-6.1-sol", recommended: true }]),
-        claude_code_loop: expect.arrayContaining([{ value: "claude-sonnet-4-6", recommended: true }]),
+        claude_code_loop: expect.arrayContaining([{ value: "claude-sonnet-5-5", recommended: true }]),
         copilot_cli: expect.arrayContaining([{ value: "gpt-5.3-codex", recommended: true }]),
         gemini_cli: expect.arrayContaining([{ value: "gemini-2.5-pro", recommended: true }]),
       },

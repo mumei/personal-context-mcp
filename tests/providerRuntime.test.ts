@@ -10,6 +10,26 @@ import { LM_STUDIO_DEFAULT_MODEL } from "#llm/providers/lmStudio";
 import { createTempRepo } from "./helpers.ts";
 
 describe("external LLM provider runtime", () => {
+  it.each([undefined, "claude-sonnet-4-6", "claude-opus-5-5"])(
+    "passes the Claude default or explicit model unchanged: %s",
+    async (model) => {
+      const { config } = await createTempRepo();
+      config.claudeCliCommand = process.execPath;
+      config.claudeCliArgs = [fileURLToPath(new URL("./fixtures/fakeClaude.mjs", import.meta.url))];
+      config.claudeCliModel = model;
+      const result = await createExternalLlmGenerator(
+        config,
+        "claude_cli",
+      )({
+        prompt: "synthetic model handoff check",
+        cwd: process.cwd(),
+        outputSchema: { type: "object" },
+      });
+      expect(result.model).toBe(model ?? "claude-sonnet-5-5");
+      expect(JSON.parse(result.text).model).toBe(model ?? "claude-sonnet-5-5");
+    },
+  );
+
   it("owns default model resolution per provider", async () => {
     const { config } = await createTempRepo();
     config.codexAppServerModel = undefined;

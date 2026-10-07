@@ -17,6 +17,7 @@ import { CODEX_APP_SERVER_DEFAULT_MODEL } from "#llm/providers/codexAppServer";
 import { CLAUDE_CLI_DEFAULT_MODEL } from "#llm/providers/claudeCli";
 import { COPILOT_CLI_DEFAULT_MODEL } from "#llm/providers/copilotCli";
 import { GEMINI_CLI_DEFAULT_MODEL } from "#llm/providers/geminiCli";
+import { CURSOR_CLI_DEFAULT_MODEL } from "#llm/providers/cursorCli";
 import {
   dailyAutomationPath,
   loadDailyAutomationSettings,
@@ -92,6 +93,8 @@ const runners = new Set<DailyTaskRunner>([
 export function dailyTaskModelOptions(): DailyTaskSettingsView["model_options"] {
   const claude = [
     { value: CLAUDE_CLI_DEFAULT_MODEL, recommended: true },
+    { value: "claude-opus-5-5", recommended: false },
+    { value: "claude-sonnet-4-6", recommended: false },
     { value: "claude-opus-4-6", recommended: false },
   ];
   return {
@@ -103,20 +106,23 @@ export function dailyTaskModelOptions(): DailyTaskSettingsView["model_options"] 
     ],
     cursor: [
       { value: "auto", recommended: true },
-      { value: CODEX_APP_SERVER_DEFAULT_MODEL, recommended: false },
-      { value: "gpt-6-astra", recommended: false },
-      { value: "gpt-6-sol", recommended: false },
-      { value: "gpt-6-luna", recommended: false },
-      ...claude.map((option) => ({ ...option, recommended: false })),
+      { value: CURSOR_CLI_DEFAULT_MODEL, recommended: false },
     ],
     claude_code_loop: claude,
     claude_desktop: claude,
     copilot_cli: [
       { value: COPILOT_CLI_DEFAULT_MODEL, recommended: true },
+      { value: "gpt-6-sol", recommended: false },
+      { value: "gpt-6-luna", recommended: false },
+      { value: "gpt-6-astra", recommended: false },
+      { value: "claude-opus-5.5", recommended: false },
+      { value: "claude-haiku-4.5", recommended: false },
+      { value: "gemini-3.7-flash", recommended: false },
       { value: "gpt-5.4", recommended: false },
     ],
     gemini_cli: [
       { value: GEMINI_CLI_DEFAULT_MODEL, recommended: true },
+      { value: "gemini-3-pro-preview", recommended: false },
       { value: "gemini-3.1-pro-preview", recommended: false },
       { value: "gemini-3-flash-preview", recommended: false },
     ],
