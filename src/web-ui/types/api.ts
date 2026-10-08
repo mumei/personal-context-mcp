@@ -90,6 +90,7 @@ export interface TaskDetail {
 export interface ActivityCalendarEvent {
   id: string;
   operational_date: string;
+  calendar_date: string;
   occurred_at?: string;
   recorded_at?: string;
   started_at?: string;
@@ -108,6 +109,7 @@ export interface ActivityCalendarResponse {
   from: string;
   to: string;
   timezone: string;
+  today: string;
   rollover_hour: number;
   events: ActivityCalendarEvent[];
   daily_counts: Record<string, number>;

@@ -19,13 +19,12 @@ const props = defineProps<{
   events: ActivityCalendarEvent[];
   projects: string[];
   timezone: string;
-  rolloverHour: number;
   selectedId?: string;
 }>();
 defineEmits<{ select: [event: ActivityCalendarEvent] }>();
 const { language, t } = useLocale();
 const days = computed(() => datesBetween(props.from, props.to));
-const hours = computed(() => Array.from({ length: 24 }, (_, index) => (props.rolloverHour + index) % 24));
+const hours = Array.from({ length: 24 }, (_, index) => index);
 
 function localHourMinute(value: string): { hour: number; minute: number; label: string } | undefined {
   const parsed = new Date(value);
@@ -44,11 +43,11 @@ function localHourMinute(value: string): { hour: number; minute: number; label: 
 
 function positionedFor(date: string): PositionedEvent[] {
   const positioned = props.events
-    .filter((event) => event.operational_date === date && event.occurred_at)
+    .filter((event) => event.calendar_date === date && event.occurred_at)
     .flatMap((event) => {
       const time = localHourMinute(event.occurred_at ?? "");
       if (!time) return [];
-      const minute = ((time.hour - props.rolloverHour + 24) % 24) * 60 + time.minute;
+      const minute = time.hour * 60 + time.minute;
       return [{ event, minute, bucket: Math.floor(minute / 30), timeLabel: time.label }];
     });
   const bucketCounts = new Map<number, number>();
@@ -62,7 +61,7 @@ function positionedFor(date: string): PositionedEvent[] {
 }
 
 function unknownFor(date: string): ActivityCalendarEvent[] {
-  return props.events.filter((event) => event.operational_date === date && !event.occurred_at);
+  return props.events.filter((event) => event.calendar_date === date && !event.occurred_at);
 }
 
 function eventStyle(item: PositionedEvent): Record<string, string> {

@@ -20,6 +20,7 @@ const EMPTY_RESPONSE: ActivityCalendarResponse = {
   from: "",
   to: "",
   timezone: "UTC",
+  today: "",
   rollover_hour: 0,
   events: [],
   daily_counts: {},
@@ -31,7 +32,7 @@ function validView(value: unknown): ActivityCalendarViewMode {
 }
 
 /** Provides the stateful workflow used by the Activity calendar page. Activityカレンダーページの状態フローを提供します。 */
-export function useActivityCalendar(today: () => string) {
+export function useActivityCalendar() {
   const route = useRoute();
   const router = useRouter();
   const response = ref<ActivityCalendarResponse>(EMPTY_RESPONSE);
@@ -40,28 +41,33 @@ export function useActivityCalendar(today: () => string) {
   const selected = ref<ActivityCalendarEvent>();
   const selectedProjects = ref<string[]>([]);
   const projectsCustomized = ref(false);
+  let requestVersion = 0;
   const view = computed(() => validView(route.query.view));
-  const focusDate = computed(() => String(route.query.date || today() || new Date().toISOString().slice(0, 10)));
-  const range = computed(() => calendarRange(focusDate.value, view.value));
+  const focusDate = computed(() => String(route.query.date || response.value.today));
+  const range = computed(() => (focusDate.value ? calendarRange(focusDate.value, view.value) : { from: "", to: "" }));
   const events = computed(() =>
     response.value.events.filter((event) => selectedProjects.value.includes(event.project)),
   );
 
   async function load(): Promise<void> {
+    const version = ++requestVersion;
     loading.value = true;
     error.value = "";
     try {
-      const params = new URLSearchParams(range.value);
-      response.value = await getJson<ActivityCalendarResponse>(`/api/activity-calendar?${params.toString()}`);
+      const params = new URLSearchParams(focusDate.value ? range.value : {});
+      const result = await getJson<ActivityCalendarResponse>(`/api/activity-calendar?${params.toString()}`);
+      if (version !== requestVersion) return;
+      response.value = result;
       selectedProjects.value = projectsCustomized.value
         ? selectedProjects.value.filter((project) => response.value.projects.includes(project))
         : [...response.value.projects];
       if (selected.value && !response.value.events.some((event) => event.id === selected.value?.id))
         selected.value = undefined;
     } catch (caught) {
+      if (version !== requestVersion) return;
       error.value = caught instanceof Error ? caught.message : String(caught);
     } finally {
-      loading.value = false;
+      if (version === requestVersion) loading.value = false;
     }
   }
 
@@ -78,7 +84,7 @@ export function useActivityCalendar(today: () => string) {
   }
 
   function goToday(): void {
-    updateRoute(today() || new Date().toISOString().slice(0, 10));
+    if (response.value.today) updateRoute(response.value.today);
   }
 
   function openDate(date: string): void {

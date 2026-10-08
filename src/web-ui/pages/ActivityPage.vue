@@ -11,14 +11,14 @@ import ActivityProjectLanes from "#webUi/components/organisms/ActivityProjectLan
 import ActivityTimeGrid from "#webUi/components/organisms/ActivityTimeGrid.vue";
 import { calendarLabel } from "#webUi/composables/activity/calendarMath";
 import { useActivityCalendar } from "#webUi/composables/activity/useActivityCalendar";
-import { useDashboard } from "#webUi/composables/useDashboard";
 import { useLocale } from "#webUi/composables/useLocale";
 
-const { state } = useDashboard();
 const { language, t } = useLocale();
-const calendar = useActivityCalendar(() => state.overview?.today ?? "");
+const calendar = useActivityCalendar();
 const locale = computed(() => (language.value === "en" ? "en-US" : "ja-JP"));
-const label = computed(() => calendarLabel(calendar.focusDate.value, calendar.view.value, locale.value));
+const label = computed(() =>
+  calendar.focusDate.value ? calendarLabel(calendar.focusDate.value, calendar.view.value, locale.value) : "",
+);
 const eventCount = computed(() => calendar.events.value.length);
 </script>
 
@@ -39,10 +39,7 @@ const eventCount = computed(() => calendar.events.value.length);
     />
     <div class="calendar-status">
       <span><CalendarClock :size="15" />{{ t("activityCount", { count: eventCount }) }}</span>
-      <span
-        >{{ calendar.response.value.timezone }} · {{ t("activityRollover") }}
-        {{ calendar.response.value.rollover_hour }}:00</span
-      >
+      <span>{{ calendar.response.value.timezone }} · 00:00–24:00</span>
     </div>
     <p v-if="calendar.error.value" class="activity-error" role="alert">
       {{ t("activityLoadFailed") }}: {{ calendar.error.value }}
@@ -57,7 +54,7 @@ const eventCount = computed(() => calendar.events.value.length);
           :from="calendar.range.value.from"
           :to="calendar.range.value.to"
           :focus-date="calendar.focusDate.value"
-          :today="state.overview?.today || ''"
+          :today="calendar.response.value.today"
           :events="calendar.events.value"
           :projects="calendar.response.value.projects"
           :selected-id="calendar.selected.value?.id"
@@ -71,7 +68,6 @@ const eventCount = computed(() => calendar.events.value.length);
           :events="calendar.events.value"
           :projects="calendar.response.value.projects"
           :timezone="calendar.response.value.timezone"
-          :rollover-hour="calendar.response.value.rollover_hour"
           :selected-id="calendar.selected.value?.id"
           @select="calendar.selectEvent"
         />
@@ -82,7 +78,6 @@ const eventCount = computed(() => calendar.events.value.length);
           :events="calendar.events.value"
           :projects="calendar.response.value.projects"
           :timezone="calendar.response.value.timezone"
-          :rollover-hour="calendar.response.value.rollover_hour"
           :selected-id="calendar.selected.value?.id"
           @select="calendar.selectEvent"
         />

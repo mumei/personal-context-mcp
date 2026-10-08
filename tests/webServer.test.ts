@@ -172,6 +172,29 @@ describe("web server", () => {
     expect(calendar).toMatchObject({ timezone: config.timezone, rollover_hour: config.activityRolloverHour });
   });
 
+  it("initializes calendar API with local today while leaving overview on the work date", async () => {
+    const { repo, config } = await createTempRepo();
+    config.timezone = "Asia/Tokyo";
+    config.activityRolloverHour = 4;
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-07-31T16:00:00Z"));
+    try {
+      const response = await liveRequest(createTaskMcpWebServer(repo, config), "/api/activity-calendar");
+      expect(response.status).toBe(200);
+      expect(await response.json()).toMatchObject({
+        today: "2026-08-01",
+        from: "2026-08-01",
+        to: "2026-08-01",
+        timezone: "Asia/Tokyo",
+      });
+      expect((await buildOverview(repo, config)).today).toBe("2026-07-31");
+      const invalid = await liveRequest(createTaskMcpWebServer(repo, config), "/api/activity-calendar?from=2026-08-01");
+      expect(invalid.status).toBe(400);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("serves the dashboard for reloadable UI routes", async () => {
     const { repo, config } = await createTempRepo();
     for (const path of [

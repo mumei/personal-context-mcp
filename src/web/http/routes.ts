@@ -33,7 +33,7 @@ import { setTaskReportVisibility } from "#domain/tasks/actions";
 import { getPersonProfile, listPersonProfiles } from "#domain/people/actions";
 import { isTaskDeleted } from "#domain/tasks/state";
 import { searchTaskContext } from "#app/search";
-import { operationalDateRange, resolveDate } from "#shared/date";
+import { operationalDateRange, resolveDate, todayInTimeZone } from "#shared/date";
 import {
   deriveCurrentStatus,
   latestDatedActivity,
@@ -147,12 +147,13 @@ export async function handleApi(
     }
     const from = url.searchParams.get("from");
     const to = url.searchParams.get("to");
-    if (!from || !to) {
-      json(res, { error: "from and to are required." }, 400);
+    if (Boolean(from) !== Boolean(to)) {
+      json(res, { error: "from and to must be supplied together." }, 400);
       return;
     }
     try {
-      json(res, await buildActivityCalendar(repo, config, from, to));
+      const today = todayInTimeZone(config.timezone);
+      json(res, await buildActivityCalendar(repo, config, from ?? today, to ?? today));
     } catch (error) {
       json(res, { error: error instanceof Error ? error.message : String(error) }, 400);
     }

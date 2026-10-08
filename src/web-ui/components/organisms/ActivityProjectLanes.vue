@@ -18,7 +18,6 @@ const props = defineProps<{
   from: string;
   to: string;
   timezone: string;
-  rolloverHour: number;
   selectedId?: string;
 }>();
 defineEmits<{ select: [event: ActivityCalendarEvent] }>();
@@ -42,7 +41,7 @@ function localTime(value?: string): { minute: number; label: string } | undefine
   const hour = Number(parts.find((part) => part.type === "hour")?.value);
   const minute = Number(parts.find((part) => part.type === "minute")?.value);
   return {
-    minute: ((hour - props.rolloverHour + 24) % 24) * 60 + minute,
+    minute: hour * 60 + minute,
     label: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
   };
 }
@@ -66,7 +65,7 @@ function laneEvents(project: string): LaneEvent[] {
     .filter((event) => event.project === project)
     .map((event) => {
       const time = localTime(event.occurred_at);
-      const minute = dayOffset(event.operational_date) * 1440 + (time?.minute ?? 0);
+      const minute = dayOffset(event.calendar_date) * 1440 + (time?.minute ?? 0);
       const bucket = Math.floor(minute / 45);
       const index = indexes.get(bucket) ?? 0;
       indexes.set(bucket, index + 1);

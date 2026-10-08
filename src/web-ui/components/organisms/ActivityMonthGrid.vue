@@ -27,7 +27,7 @@ const weekdays = computed(() => {
 });
 
 function eventsFor(date: string): ActivityCalendarEvent[] {
-  return props.events.filter((event) => event.operational_date === date);
+  return props.events.filter((event) => event.calendar_date === date);
 }
 
 function projectColor(project: string): number {
