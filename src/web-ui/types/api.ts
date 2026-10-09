@@ -140,6 +140,38 @@ export interface ReportOutputs {
 }
 
 /**
+ * Describes the weekly report API response for a selected week and optional cutoff.
+ *
+ * 選択した週と任意の終了日を対象とする週次レポートAPIレスポンスです。
+ */
+export interface WeeklyReportResponse {
+  week_start: string;
+  week_end: string;
+  through: string;
+  timezone: string;
+  rollover_hour: number;
+  today: string;
+  provisional: boolean;
+  generated_at?: string;
+  exists: boolean;
+  recorded_dates: string[];
+  missing_dates: string[];
+  text: { text: string };
+  markdown: { text: string; html: string };
+}
+
+/** Describes saved weekly versions and ungenerated period choices.
+ * 保存済み週次版と未生成の期間候補を表します。
+ */
+export interface WeeklyHistoryResponse {
+  today: string;
+  current_week: string;
+  week_start_day: number;
+  periods: { week_start: string; week_end: string; through: string; can_generate: boolean }[];
+  versions: { week_start: string; week_end: string; through: string; generated_at: string; provisional: boolean }[];
+}
+
+/**
  * Describes one durable, task-independent knowledge note shown in the graph audit UI.
  *
  * グラフ監査UIに表示する、タスクに依存しない永続的な知識ノートを表します。

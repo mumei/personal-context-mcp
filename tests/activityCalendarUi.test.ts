@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 import { mount } from "@vue/test-utils";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { i18n } from "#webUi/i18n/index";
@@ -51,6 +52,27 @@ const event: ActivityCalendarEvent = {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("Activity calendar UI calendar-day contract", () => {
+  it("lets the page own vertical scrolling while retaining horizontal calendar overflow", () => {
+    const source = readFileSync("src/web-ui/components/organisms/ActivityTimeGrid.vue", "utf8");
+    const scrollRules = [...source.matchAll(/\.time-scroll\s*\{([^}]+)\}/g)].map((match) => match[1]);
+    expect(scrollRules).toHaveLength(1);
+    expect(scrollRules[0]).toContain("overflow-x: auto");
+    expect(scrollRules[0]).not.toMatch(/(?:max-)?height\s*:/);
+    expect(scrollRules[0]).not.toMatch(/overflow(?:-y)?\s*:\s*(?:auto|scroll)/);
+  });
+  it("keeps the complete 24-hour axis and late-night event selectable", async () => {
+    const late = { ...event, id: "late", occurred_at: "2026-08-01T14:59:00Z" };
+    const grid = mount(ActivityTimeGrid, {
+      props: { from: "2026-08-01", to: "2026-08-01", events: [late], projects: ["Project"], timezone: "Asia/Tokyo" },
+      global: { plugins: [i18n] },
+    });
+    expect(grid.findAll(".hour-labels span")).toHaveLength(24);
+    expect(grid.findAll(".hour-labels span").at(-1)?.text()).toBe("23:00");
+    expect(grid.find(".positioned-event").attributes("style")).toContain("top: 1151.2px");
+    await grid.get(".activity-event").trigger("click");
+    expect(grid.emitted("select")?.[0]).toEqual([late]);
+    grid.unmount();
+  });
   it("places month events on calendar_date and highlights local today", () => {
     const wrapper = mount(ActivityMonthGrid, {
       props: {

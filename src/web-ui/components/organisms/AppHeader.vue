@@ -13,14 +13,16 @@ const route = useRoute();
 const { t } = useLocale();
 const visibilitySaving = ref(false);
 const hidesDateTools = computed(() =>
-  ["tickets", "activity", "global", "knowledge", "people", "settings", "help"].includes(String(route.name)),
+  ["tickets", "activity", "global", "knowledge", "people", "settings", "help", "weekly-report"].includes(
+    String(route.name),
+  ),
 );
 const title = computed(() =>
   route.name === "tickets"
     ? t("tickets")
     : route.name === "summary"
       ? t("summary")
-      : route.name === "report"
+      : route.name === "report" || route.name === "weekly-report"
         ? t("report")
         : route.name === "activity"
           ? t("activity")
@@ -78,21 +80,23 @@ async function setReportVisibility(visible: boolean): Promise<void> {
         {{
           route.name === "summary"
             ? t("morningBrief")
-            : route.name === "report"
-              ? t("dailyReport")
-              : route.name === "activity"
-                ? t("activityDescription")
-                : route.name === "global"
-                  ? t("globalDescription")
-                  : route.name === "knowledge"
-                    ? t("knowledgeDescription")
-                    : route.name === "people"
-                      ? t("peopleDescription")
-                      : route.name === "settings"
-                        ? t("settings")
-                        : route.name === "help"
-                          ? t("helpDescription")
-                          : ""
+            : route.name === "weekly-report"
+              ? t("weeklyReport")
+              : route.name === "report"
+                ? t("dailyReport")
+                : route.name === "activity"
+                  ? t("activityDescription")
+                  : route.name === "global"
+                    ? t("globalDescription")
+                    : route.name === "knowledge"
+                      ? t("knowledgeDescription")
+                      : route.name === "people"
+                        ? t("peopleDescription")
+                        : route.name === "settings"
+                          ? t("settings")
+                          : route.name === "help"
+                            ? t("helpDescription")
+                            : ""
         }}
       </p>
     </div>

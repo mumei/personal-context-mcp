@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getJson, mutateJson } from "#webUi/services/api";
 import { useDailyScheduleForm } from "#webUi/composables/settings/useDailyScheduleForm";
 import { useDailyTaskAutomation } from "#webUi/composables/settings/useDailyTaskAutomation";
+import { useReportSettings } from "#webUi/composables/settings/useReportSettings";
 import { normalizeRolloverHour } from "#webUi/composables/settings/useProfileSettings";
 import type { AutomationStatus } from "#webUi/composables/settings/types";
 import type { MessageKey } from "#webUi/composables/useLocale";
@@ -40,6 +41,31 @@ describe("settings composables", () => {
     expect(normalizeRolloverHour("０４")).toBe(4);
     expect(normalizeRolloverHour("２４")).toBe(23);
     expect(normalizeRolloverHour(-1)).toBe(0);
+  });
+
+  it("loads and saves the selected weekly report start day", async () => {
+    vi.mocked(getJson).mockResolvedValue({ week_start_day: 0, path: "/tmp/config/report.yaml" });
+    vi.mocked(mutateJson).mockResolvedValue({ week_start_day: 6, path: "/tmp/config/report.yaml" });
+    const settings = useReportSettings();
+
+    await settings.load();
+    expect(settings.report).toMatchObject({ week_start_day: 0, path: "/tmp/config/report.yaml" });
+    expect(settings.closingDay.value).toBe(6);
+    settings.closingDay.value = 5;
+    expect(settings.report.week_start_day).toBe(6);
+    await settings.save();
+
+    expect(mutateJson).toHaveBeenCalledWith("/api/settings/report", "PUT", { week_start_day: 6 });
+    expect(settings.report).toMatchObject({ week_start_day: 6, path: "/tmp/config/report.yaml" });
+  });
+
+  it("converts every closing weekday to the following start weekday without changing the schema", () => {
+    const settings = useReportSettings();
+    for (let closing = 0; closing < 7; closing++) {
+      settings.closingDay.value = closing;
+      expect(settings.report.week_start_day).toBe((closing + 1) % 7);
+      expect(settings.closingDay.value).toBe(closing);
+    }
   });
 
   it("round-trips execution controls through the daily RRULE", () => {

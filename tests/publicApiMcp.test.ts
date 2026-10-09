@@ -50,7 +50,9 @@ describe("public MCP API", () => {
       expect(tools.has("task_memory_generate_mindmap")).toBe(true);
       expect(tools.has("report_render_output")).toBe(true);
       expect(tools.has("report_set_task_visibility")).toBe(true);
-      expect(tools.size).toBe(60);
+      expect(tools.has("report_generate_weekly")).toBe(true);
+      expect(tools.has("report_get_weekly")).toBe(true);
+      expect(tools.size).toBe(62);
       for (const name of [
         "ticket_create_item",
         "ticket_list_items",

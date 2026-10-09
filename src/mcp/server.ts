@@ -32,6 +32,7 @@ import { registerMemoryGenerationTools } from "#mcp/tools/memoryGeneration";
 import { registerMemoryStateTools } from "#mcp/tools/memoryState";
 import { registerPeopleTools } from "#mcp/tools/people";
 import { registerReportTools } from "#mcp/tools/reports";
+import { registerWeeklyReportTools } from "#mcp/tools/weeklyReports";
 import { registerSessionTools } from "#mcp/tools/session";
 import { registerSystemTools } from "#mcp/tools/system";
 import { registerTaskTools } from "#mcp/tools/tasks";
@@ -114,6 +115,7 @@ export function createServer(): McpServer {
     ),
   );
   registerReportTools(context, (date, format) => generation.generateDateReport(repo, date, format));
+  registerWeeklyReportTools(context, (request) => generation.generateStructured(request));
   registerMemoryStateTools(context);
   registerMemoryGenerationTools(context, {
     promote: ({ date, taskId, lookbackDays, maxTokens, force }) =>

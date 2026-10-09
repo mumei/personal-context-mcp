@@ -185,8 +185,9 @@ function dayLabel(date: string): string {
   border-top: 1px solid var(--color-rule);
 }
 .time-scroll {
-  height: min(66dvh, 720px);
-  overflow: auto;
+  overflow-x: auto;
+  /* Leave room for event buttons placed immediately before midnight. */
+  padding-bottom: calc(var(--space-xl) + var(--space-xs));
 }
 .time-body {
   height: 1152px;
@@ -220,10 +221,5 @@ function dayLabel(date: string): string {
   position: absolute;
   z-index: 2;
   min-width: 0;
-}
-@media (max-width: 760px) {
-  .time-scroll {
-    height: 62dvh;
-  }
 }
 </style>

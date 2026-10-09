@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Copy, RefreshCw } from "@lucide/vue";
 import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { getJson, mutateJson } from "#webUi/services/api";
 import type { ReportOutputs } from "#webUi/types/api";
 import BaseButton from "#webUi/components/atoms/BaseButton.vue";
@@ -62,6 +62,10 @@ watch(() => [format.value, date.value], load);
         <h2>{{ t("dailyReport") }}</h2>
         <p>{{ date }}</p>
       </div>
+      <nav class="report-navigation" :aria-label="t('report')">
+        <RouterLink :to="{ path: '/report/text', query: route.query }">{{ t("dailyReport") }}</RouterLink>
+        <RouterLink to="/report/weekly/text">{{ t("weeklyReport") }}</RouterLink>
+      </nav>
     </div>
     <div class="report surface">
       <div class="sync-status" :class="{ current: pendingTasks.length === 0 }">
@@ -109,6 +113,14 @@ watch(() => [format.value, date.value], load);
 <style scoped>
 .report {
   overflow: hidden;
+}
+.report-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.report-navigation a {
+  color: var(--accent);
 }
 .tabs {
   display: flex;

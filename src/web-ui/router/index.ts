@@ -18,6 +18,7 @@ import HelpPage from "#webUi/pages/HelpPage.vue";
 import KnowledgePage from "#webUi/pages/KnowledgePage.vue";
 import PeoplePage from "#webUi/pages/PeoplePage.vue";
 import ReportPage from "#webUi/pages/ReportPage.vue";
+import WeeklyReportPage from "#webUi/pages/WeeklyReportPage.vue";
 import SettingsPage from "#webUi/pages/SettingsPage.vue";
 import SummaryPage from "#webUi/pages/SummaryPage.vue";
 import TaskPage from "#webUi/pages/TaskPage.vue";
@@ -30,6 +31,7 @@ export const router = createRouter({
     { path: "/summary", name: "summary", component: SummaryPage },
     { path: "/activity", name: "activity", component: ActivityPage },
     { path: "/tickets", name: "tickets", component: TicketsPage },
+    { path: "/report/weekly/:format(text|markdown)?", name: "weekly-report", component: WeeklyReportPage },
     { path: "/report/:format(text|markdown)?", name: "report", component: ReportPage },
     { path: "/global", name: "global", component: GlobalPage },
     { path: "/knowledge", name: "knowledge", component: KnowledgePage },

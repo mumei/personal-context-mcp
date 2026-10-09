@@ -38,6 +38,43 @@ afterEach(() => {
 });
 
 describe("Web UI accessibility", () => {
+  it.each(["ja", "en"] as const)(
+    "links directly to daily and weekly reports and retains selection across formats (%s)",
+    async (language) => {
+      vi.stubGlobal(
+        "matchMedia",
+        vi.fn(() => mobileMediaQuery(false)),
+      );
+      const appRouter = createRouter({
+        history: createMemoryHistory(),
+        routes: [
+          { path: "/report/weekly/:format?", name: "weekly-report", component: { template: "<div />" } },
+          { path: "/report/:format?", name: "report", component: { template: "<div />" } },
+          { path: "/:pathMatch(.*)*", component: { template: "<div />" } },
+        ],
+      });
+      i18n.global.locale.value = language;
+      await appRouter.push("/report/weekly/markdown");
+      const wrapper = mount(AppSidebar, { global: { plugins: [i18n, appRouter] } });
+      try {
+        const daily = wrapper.get('a[href="/report/text"]');
+        const weekly = wrapper.get('a[href="/report/weekly/text"]');
+        expect(daily.text()).toBe(language === "ja" ? "日次レポート" : "Daily report");
+        expect(weekly.text()).toBe(language === "ja" ? "週次レポート" : "Weekly report");
+        expect(weekly.attributes("aria-current")).toBe("page");
+        expect(daily.attributes("aria-current")).toBeUndefined();
+        await daily.trigger("click");
+        await vi.waitFor(() => expect(appRouter.currentRoute.value.name).toBe("report"));
+        await appRouter.push("/report/markdown");
+        expect(daily.classes()).toContain("router-link-active");
+        expect(daily.attributes("aria-current")).toBe("page");
+        expect(weekly.classes()).not.toContain("router-link-active");
+      } finally {
+        wrapper.unmount();
+        i18n.global.locale.value = "ja";
+      }
+    },
+  );
   it("announces the mobile drawer state and returns focus after Escape", async () => {
     vi.stubGlobal(
       "matchMedia",

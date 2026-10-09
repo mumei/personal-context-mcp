@@ -6,6 +6,7 @@ import { useAutomationStatus } from "#webUi/composables/settings/useAutomationSt
 import { useDailyScheduleForm } from "#webUi/composables/settings/useDailyScheduleForm";
 import { useDailyTaskAutomation } from "#webUi/composables/settings/useDailyTaskAutomation";
 import { useProfileSettings } from "#webUi/composables/settings/useProfileSettings";
+import { useReportSettings } from "#webUi/composables/settings/useReportSettings";
 import { useMaintenanceSettings } from "#webUi/composables/settings/useMaintenanceSettings";
 import type { DailyTaskClientStatus, DailyTaskRunner } from "#webUi/composables/settings/types";
 import { useLocale } from "#webUi/composables/useLocale";
@@ -28,6 +29,7 @@ const timezones = [
 ];
 const { language, t, setLanguage } = useLocale();
 const profileSettings = useProfileSettings();
+const reportSettings = useReportSettings();
 const maintenanceSettings = useMaintenanceSettings();
 const { maintenance, running: maintenanceRunning } = maintenanceSettings;
 const { profile } = profileSettings;
@@ -131,7 +133,12 @@ function scheduleLabel(schedule?: string): string {
 }
 
 onMounted(async () => {
-  await Promise.all([profileSettings.load(), automationStatus.load(), maintenanceSettings.load()]);
+  await Promise.all([
+    profileSettings.load(),
+    reportSettings.load(),
+    automationStatus.load(),
+    maintenanceSettings.load(),
+  ]);
   loading.value = false;
 });
 
@@ -143,6 +150,11 @@ async function saveProfile() {
 async function saveMaintenance() {
   await maintenanceSettings.save();
   emit("saved", t("maintenanceSaved"));
+}
+
+async function saveReportSettings() {
+  await reportSettings.save();
+  emit("saved", t("reportSettingsSaved"));
 }
 
 async function runMaintenance() {
@@ -188,6 +200,23 @@ function openSetup() {
           }}<input v-model="profile.activity_rollover_hour" inputmode="numeric" pattern="[0-9０-９]{1,2}" required
         /></label>
       </div>
+      <BaseButton variant="primary">{{ t("saveSettings") }}</BaseButton>
+    </form>
+
+    <form id="weekly-report-settings" class="surface form" @submit.prevent="saveReportSettings">
+      <SectionHeader :title="t('weeklyReportSettings')" />
+      <label
+        >{{ t("weekClosingDay")
+        }}<select v-model.number="reportSettings.closingDay.value" required>
+          <option :value="0">{{ t("weekdaySunday") }}</option>
+          <option :value="1">{{ t("weekdayMonday") }}</option>
+          <option :value="2">{{ t("weekdayTuesday") }}</option>
+          <option :value="3">{{ t("weekdayWednesday") }}</option>
+          <option :value="4">{{ t("weekdayThursday") }}</option>
+          <option :value="5">{{ t("weekdayFriday") }}</option>
+          <option :value="6">{{ t("weekdaySaturday") }}</option>
+        </select></label
+      >
       <BaseButton variant="primary">{{ t("saveSettings") }}</BaseButton>
     </form>
 

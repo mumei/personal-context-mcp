@@ -135,10 +135,22 @@ onBeforeUnmount(() => {
           ><small>{{ t("morningBrief") }}</small></span
         ></RouterLink
       >
-      <RouterLink to="/report/text" :title="`${t('report')}: ${t('dailyReport')}`"
+      <RouterLink
+        to="/report/text"
+        :title="t('dailyReport')"
+        :class="{ 'router-link-active': route.name === 'report' }"
+        :aria-current="route.name === 'report' ? 'page' : undefined"
         ><FileText :size="17" /><span
-          ><strong>{{ t("report") }}</strong
-          ><small>{{ t("dailyReport") }}</small></span
+          ><strong>{{ t("dailyReport") }}</strong></span
+        ></RouterLink
+      >
+      <RouterLink
+        to="/report/weekly/text"
+        :title="t('weeklyReport')"
+        :class="{ 'router-link-active': route.name === 'weekly-report' }"
+        :aria-current="route.name === 'weekly-report' ? 'page' : undefined"
+        ><FileText :size="17" /><span
+          ><strong>{{ t("weeklyReport") }}</strong></span
         ></RouterLink
       >
       <RouterLink to="/activity" :title="`${t('activity')}: ${t('activityNavDescription')}`"

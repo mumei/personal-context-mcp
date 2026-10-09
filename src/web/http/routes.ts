@@ -58,6 +58,10 @@ import {
 import { json, readJsonBody } from "#web/http/response";
 import { knowledgeGraphView } from "#web/knowledge/view";
 import { buildActivityCalendar } from "#web/activity/calendar";
+import { generateWeeklyReport, readWeeklyReport } from "#domain/reports/weekly/generation";
+import { listWeeklyHistory } from "#domain/reports/weekly/history";
+import { loadReportSettings, reportSettingsPath, updateReportSettings } from "#infra/config/reportSettings";
+import { resolveWeeklyPeriod } from "#domain/reports/weekly/range";
 import { ticketApi, ticketDetailApi } from "#web/http/tickets";
 
 /**
@@ -73,6 +77,7 @@ export function isAllowedMutation(method: string | undefined, pathname: string):
         "/api/summary/generate",
         "/api/summary/progress",
         "/api/report/generate",
+        "/api/report/weekly/generate",
         "/api/global/resolve-agent-updates",
         "/api/settings/maintenance/run",
       ].includes(pathname)) ||
@@ -81,7 +86,12 @@ export function isAllowedMutation(method: string | undefined, pathname: string):
     (method === "POST" && /^\/api\/task\/[^/]+\/(?:mindmap|organize)$/.test(pathname)) ||
     (method === "PUT" && /^\/api\/task\/[^/]+\/report-visibility$/.test(pathname)) ||
     (method === "PUT" &&
-      ["/api/settings/daily-task", "/api/settings/profile", "/api/settings/maintenance"].includes(pathname))
+      [
+        "/api/settings/daily-task",
+        "/api/settings/profile",
+        "/api/settings/maintenance",
+        "/api/settings/report",
+      ].includes(pathname))
   );
 }
 
@@ -132,6 +142,67 @@ export async function handleApi(
   res: ServerResponse,
 ): Promise<void> {
   const date = url.searchParams.get("date") ?? undefined;
+  if (url.pathname === "/api/settings/report") {
+    if (req.method === "GET") json(res, { ...loadReportSettings(repo.root), path: reportSettingsPath(repo.root) });
+    else if (req.method === "PUT") {
+      const body = await readJsonBody(req);
+      json(res, await updateReportSettings(repo, { week_start_day: body.week_start_day as number }));
+    } else json(res, { error: "Method not allowed." }, 405);
+    return;
+  }
+  if (url.pathname === "/api/report/weekly/history") {
+    if (req.method !== "GET") json(res, { error: "Method not allowed." }, 405);
+    else json(res, await listWeeklyHistory(repo, config));
+    return;
+  }
+  if (url.pathname === "/api/report/weekly" || url.pathname === "/api/report/weekly/generate") {
+    const generating = url.pathname.endsWith("/generate");
+    if (req.method !== (generating ? "POST" : "GET")) {
+      json(res, { error: "Method not allowed." }, 405);
+      return;
+    }
+    const body = generating
+      ? await readJsonBody(req)
+      : { week: url.searchParams.get("week") ?? undefined, through: url.searchParams.get("through") ?? undefined };
+    if (
+      (body.week !== undefined && typeof body.week !== "string") ||
+      (body.through !== undefined && typeof body.through !== "string")
+    ) {
+      json(res, { error: "week and through must be dates in YYYY-MM-DD format." }, 400);
+      return;
+    }
+    let savedResult: Awaited<ReturnType<typeof readWeeklyReport>> | undefined;
+    try {
+      if (generating)
+        resolveWeeklyPeriod(
+          config,
+          loadReportSettings(repo.root).week_start_day,
+          body.week as string | undefined,
+          body.through as string | undefined,
+        );
+      else
+        savedResult = await readWeeklyReport(
+          repo,
+          config,
+          body.week as string | undefined,
+          body.through as string | undefined,
+        );
+    } catch (error) {
+      json(res, { error: error instanceof Error ? error.message : String(error) }, 400);
+      return;
+    }
+    const result = generating
+      ? await generateWeeklyReport(
+          repo,
+          config,
+          body.week as string | undefined,
+          body.through as string | undefined,
+          (input) => generateWebLlm(config, input),
+        )
+      : savedResult!;
+    json(res, { ...result, markdown: { ...result.markdown, html: renderMarkdownBody(result.markdown.text) } });
+    return;
+  }
   if (url.pathname === "/api/tickets/detail") {
     await ticketDetailApi(req, res, repo, url);
     return;
