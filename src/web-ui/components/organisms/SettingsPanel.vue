@@ -5,7 +5,7 @@ import { parseDailySchedule, type DailyScheduleWeekday } from "#shared/dailySche
 import { useAutomationStatus } from "#webUi/composables/settings/useAutomationStatus";
 import { useDailyScheduleForm } from "#webUi/composables/settings/useDailyScheduleForm";
 import { useDailyTaskAutomation } from "#webUi/composables/settings/useDailyTaskAutomation";
-import { useProfileSettings } from "#webUi/composables/settings/useProfileSettings";
+import { normalizeRolloverHour, useProfileSettings } from "#webUi/composables/settings/useProfileSettings";
 import { useReportSettings } from "#webUi/composables/settings/useReportSettings";
 import { useMaintenanceSettings } from "#webUi/composables/settings/useMaintenanceSettings";
 import type { DailyTaskClientStatus, DailyTaskRunner } from "#webUi/composables/settings/types";
@@ -33,6 +33,20 @@ const reportSettings = useReportSettings();
 const maintenanceSettings = useMaintenanceSettings();
 const { maintenance, running: maintenanceRunning } = maintenanceSettings;
 const { profile } = profileSettings;
+const weeklyClosingDescription = computed(() => {
+  const closing = reportSettings.closingDay.value;
+  const weekday = (day: number) =>
+    new Intl.DateTimeFormat(language.value, { weekday: "long", timeZone: "UTC" }).format(
+      new Date(Date.UTC(2026, 0, 4 + day)),
+    );
+  const hour = normalizeRolloverHour(profile.activity_rollover_hour);
+  return t(hour === 0 ? "weeklyClosingMidnightDescription" : "weeklyClosingDescription", {
+    closing: weekday(closing),
+    next: weekday((closing + 1) % 7),
+    hour: Number.isFinite(hour) ? hour : "—",
+    timezone: profile.timezone,
+  });
+});
 const automationStatus = useAutomationStatus();
 const { automation, configuredRunner } = automationStatus;
 const scheduleForm = useDailyScheduleForm();
@@ -207,7 +221,11 @@ function openSetup() {
       <SectionHeader :title="t('weeklyReportSettings')" />
       <label
         >{{ t("weekClosingDay")
-        }}<select v-model.number="reportSettings.closingDay.value" required>
+        }}<select
+          v-model.number="reportSettings.closingDay.value"
+          aria-describedby="weekly-closing-description"
+          required
+        >
           <option :value="0">{{ t("weekdaySunday") }}</option>
           <option :value="1">{{ t("weekdayMonday") }}</option>
           <option :value="2">{{ t("weekdayTuesday") }}</option>
@@ -217,6 +235,7 @@ function openSetup() {
           <option :value="6">{{ t("weekdaySaturday") }}</option>
         </select></label
       >
+      <p id="weekly-closing-description" class="closing-description">{{ weeklyClosingDescription }}</p>
       <BaseButton variant="primary">{{ t("saveSettings") }}</BaseButton>
     </form>
 
@@ -420,6 +439,13 @@ function openSetup() {
   min-width: 0;
   gap: 18px;
   padding: 22px;
+}
+.closing-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 .fields {
   display: grid;

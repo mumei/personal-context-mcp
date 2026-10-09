@@ -90,7 +90,6 @@ async function copy(): Promise<void> {
             </option>
           </select>
         </label>
-        <RouterLink to="/settings#weekly-report-settings">{{ t("weeklyReportSettings") }}</RouterLink>
       </div>
     </div>
 
@@ -209,9 +208,6 @@ async function copy(): Promise<void> {
 }
 .range-controls {
   align-items: end;
-}
-.range-controls a {
-  padding: 9px 0;
 }
 .partial-controls,
 .boundary-note {

@@ -4,6 +4,8 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { createMemoryHistory, createRouter } from "vue-router";
 import { i18n } from "#webUi/i18n/index";
 import WeeklyReportPage from "#webUi/pages/WeeklyReportPage.vue";
+import ReportPage from "#webUi/pages/ReportPage.vue";
+import SettingsPanel from "#webUi/components/organisms/SettingsPanel.vue";
 import { getJson, mutateJson } from "#webUi/services/api";
 import type { WeeklyReportResponse } from "#webUi/types/api";
 
@@ -66,6 +68,56 @@ afterEach(() => {
 });
 
 describe("Weekly report UI", () => {
+  it("explains the selected closing day and rollover in both languages without saving settings", async () => {
+    vi.mocked(getJson).mockImplementation(async (url) => {
+      if (url === "/api/settings/profile") return { timezone: "Asia/Tokyo", activity_rollover_hour: 0 };
+      if (url === "/api/settings/report") return { week_start_day: 1 };
+      return {};
+    });
+    i18n.global.locale.value = "ja";
+    const wrapper = mount(SettingsPanel, { global: { plugins: [i18n] } });
+    await flushPromises();
+    const description = () => wrapper.get("#weekly-closing-description").text();
+    expect(description()).toContain("日曜日の終わりまでが対象です。月曜日の午前0時から次の週");
+    await wrapper.get('input[inputmode="numeric"]').setValue("０４");
+    expect(description()).toContain("月曜日の4時直前まで");
+    await wrapper.get("#weekly-report-settings select").setValue(6);
+    expect(description()).toContain("土曜日の作業日");
+    expect(description()).toContain("日曜日の4時から次の週");
+    i18n.global.locale.value = "en";
+    await flushPromises();
+    expect(description()).toContain("Saturday's workday");
+    expect(description()).toContain("4:00 on Sunday");
+    expect(mutateJson).not.toHaveBeenCalled();
+    wrapper.unmount();
+    i18n.global.locale.value = "ja";
+  });
+  it("keeps daily report content and format controls without duplicate daily/weekly navigation", async () => {
+    vi.mocked(getJson).mockResolvedValue({ text: { text: "Daily summary" }, sync: { tasks: [] } });
+    const router = makeRouter();
+    await router.push("/report/text?date=2026-10-10");
+    const wrapper = mount(ReportPage, { global: { plugins: [router, i18n] } });
+    await flushPromises();
+    expect(wrapper.get("pre").text()).toBe("Daily summary");
+    expect(wrapper.text()).toContain("2026-10-10");
+    expect(wrapper.find(".report-navigation").exists()).toBe(false);
+    expect(wrapper.findAll("a")).toHaveLength(0);
+    expect(wrapper.get(".tabs").text()).toContain("Markdown");
+    wrapper.unmount();
+  });
+
+  it("keeps weekly selection and generation without a duplicate settings link or icon", async () => {
+    const router = makeRouter();
+    await router.push("/report/weekly/text");
+    const wrapper = mount(WeeklyReportPage, { global: { plugins: [router, i18n] } });
+    await flushPromises();
+    expect(wrapper.findAll(".range-controls select")).toHaveLength(2);
+    expect(wrapper.findAll(".range-controls a, .range-controls button")).toHaveLength(0);
+    expect(wrapper.get("pre").text()).toBe("Weekly summary");
+    expect(wrapper.get(".toolbar button").attributes("disabled")).toBeUndefined();
+    wrapper.unmount();
+  });
+
   it("opens an old saved range without generating or reinterpreting its boundaries", async () => {
     vi.mocked(getJson).mockImplementation(async (url) => {
       if (url === "/api/report/weekly/history") {

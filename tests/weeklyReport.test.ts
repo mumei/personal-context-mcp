@@ -87,6 +87,18 @@ describe("weekly saved history", () => {
 });
 
 describe("weekly period boundaries", () => {
+  it.each([0, 4])("includes the instant before the Sunday closing boundary at %i and excludes the boundary", (hour) => {
+    const config = { timezone: "Asia/Tokyo", activityRolloverHour: hour };
+    const boundary = Date.parse(`2026-10-12T${String(hour).padStart(2, "0")}:00:00+09:00`);
+    expect(resolveWeeklyPeriod(config, 1, undefined, undefined, new Date(boundary - 1))).toMatchObject({
+      week_start: "2026-10-05",
+      today: "2026-10-11",
+    });
+    expect(resolveWeeklyPeriod(config, 1, undefined, undefined, new Date(boundary))).toMatchObject({
+      week_start: "2026-10-12",
+      today: "2026-10-12",
+    });
+  });
   it("uses the operational timezone and rollover, not the calendar date", () => {
     const config = { timezone: "Asia/Tokyo", activityRolloverHour: 4 };
     expect(resolveWeeklyPeriod(config, 1, undefined, undefined, new Date("2026-10-07T18:00:00Z"))).toMatchObject({
